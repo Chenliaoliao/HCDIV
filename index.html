@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Assignment 1</title>
+  <style>
+    /* Basic styles for table */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    #timestring {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Singapore 2-Hour Weather Forecast</h2>
+  <h4 id="timestring">Last Updated: </h4>
+  <table id="weatherTable">
+      <tr>
+          <th>Area</th>
+          <th>Forecast</th>
+      </tr>
+  </table>
+
+  <script>
+   fetch('https://api-open.data.gov.sg/v2/real-time/api/two-hr-forecast', { cache: 'no-store' })
+  .then(response => response.json())
+  .then(responsedata => {
+    console.log(JSON.stringify(responsedata, null, 2)); 
+    if (responsedata.data && responsedata.data.items && responsedata.data.items.length > 0) {
+      let timestamp = responsedata.data.items[0].update_timestamp;
+      let forecasts = responsedata.data.items[0].forecasts;
+
+      document.getElementById("timestring").innerText = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
+
+      const table = document.getElementById("weatherTable");
+      forecasts.forEach(forecast => {
+        const row = table.insertRow();
+        const areaCell = row.insertCell(0);
+        const forecastCell = row.insertCell(1);
+
+        areaCell.textContent = forecast.area;
+        forecastCell.textContent = forecast.forecast;
+      });
+    } else {
+      console.error('No forecast data available.');
+    }
+  })
+  .catch(error => console.error('Error fetching the weather data:', error));
+  </script>
+</body>
+</html>
